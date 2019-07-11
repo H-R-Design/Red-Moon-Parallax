@@ -346,28 +346,28 @@ var motion = {
 window.addEventListener('deviceorientation', function(event) {
 	// If this is the first run through here, set the initial position of the gyroscope
 	if (!motion_initial.x && !motion_initial.y) {
-		motion_initial.x = event.beta;
-		motion_initial.y = event.gamma;
+		motion_initial.y = event.beta;
+		motion_initial.x = event.gamma;
 	}
 	
 	// Depending on what orientation the device is in, you need to adjust what each gyroscope axis means
 	// This can be a bit tricky
     if (window.orientation === 0) {
     	// The device is right-side up in portrait orientation
-    	motion.x = event.gamma - motion_initial.y;
-    	motion.y = event.beta - motion_initial.x;
+    	motion.y = event.gamma - motion_initial.x;
+    	motion.x = event.beta - motion_initial.y;
     } else if (window.orientation === 90) {
     	// The device is in landscape laying on its left side
-    	motion.x = event.beta - motion_initial.x;
-    	motion.y = -event.gamma + motion_initial.y;
+    	motion.y = event.beta - motion_initial.y;
+    	motion.x = -event.gamma + motion_initial.x;
     } else if (window.orientation === -90) {
     	// The device is in landscape laying on its right side
-    	motion.x = -event.beta + motion_initial.x;
-    	motion.y = event.gamma - motion_initial.y;
+    	motion.y = -event.beta + motion_initial.y;
+    	motion.x = event.gamma - motion_initial.x;
     } else {
     	// The device is upside-down in portrait orientation
-		motion.x = -event.gamma + motion_initial.y;
-		motion.y = -event.beta + motion_initial.x;
+		motion.y = -event.gamma + motion_initial.x;
+		motion.x = -event.beta + motion_initial.y;
     }
 
 	// This is optional, but prevents things from moving too far (because these are 2d images it can look broken)
