@@ -1,102 +1,110 @@
-//get ref to canvas
+// Get reference to Canvas
 var canvas = document.getElementById('canvas');
 
-//get ref to canvas context 
+// Get reference to Canvas Context
 var context = canvas.getContext('2d');
 
-// get ref to loading screen
 // Get reference to loading screen
 var loading_screen = document.getElementById('loading');
 
-// initialise loading variables 
+// Initialize loading variables
 var loaded = false;
 var load_counter = 0;
 
 //intialise images for layers
-var background = new image();
-var tree_back = new image();
-var moon = new image();
-var clouds = new image();
-var tree_mid  = new image();
-var floaties_1 = new image();
-var tree_front = new image();
-var leaf_back = new image();
-var shadows = new image();
-var mask = new image();
-var panther = new image();
-var leaves_left = new image();
-var leaves_right = new image();
-var floaties_2 = new image();
+var background = new Image();
+var moon = new Image();
+var clouds = new Image();
+var mid_tree = new Image();
+var back_tree  = new Image();
+var leaves_back = new Image();
+var shadows = new Image();
+var panther = new Image();
+var front_tree = new Image();
+var leaves_front = new Image();
+var mask = new Image();
+var lights_back = new Image();
+var lights_front = new Image();
+
+
 
 //create list of layer objects
 var layer_list =[
     {
         'image': background, 
-        'src': './layers/',
-        'z_index': -4.25,
-        'position': {x: 0, y:0},
-        'blend': null,
-        'opasity': 1
-    },
-    {
-        'image': tree_back, 
-        'src': './layers/',
-        'z_index': -4,
+        'src': './layers/background.png',
+        'z_index': -3.95,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
         'image': moon, 
-        'src': './layers/',
-        'z_index': -3.25,
+        'src': './layers/moon.png',
+        'z_index': -3.85,
         'position': {x: 0, y:0},
-        'blend': null, //may need to add blend mode same as procreate//
+        'blend': null,
         'opasity': 1
     },
     {
         'image': clouds, 
-        'src': './layers/',
+        'src': './layers/clouds.png',
+        'z_index': -3.15,
+        'position': {x: 0, y:0},
+        'blend': null, 
+        'opasity': 1
+    },
+    {
+        'image': mid_tree, 
+        'src': './layers/mid_tree.png',
         'z_index': -3,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
-        'image': tree_mid, 
-        'src': './layers/',
+        'image': back_tree, 
+        'src': './layers/back_tree.png',
+        'z_index': -2.75,
+        'position': {x: 0, y:0},
+        'blend': null,
+        'opasity': 1
+    },
+    {
+        'image': leaves_back, 
+        'src': './layers/leaves_back.png',
         'z_index': -2.25,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
-        'image': floaties_1, 
-        'src': './layers/',
-        'z_index': -2,
+        'image': shadows, 
+        'src': './layers/shadows.png',
+        'z_index': -1.75,
         'position': {x: 0, y:0},
-        'blend': null,
+        'blend': 'multiply', //may need to add blend mode same as procreate//
         'opasity': 1
     },
     {
-        'image': tree_front, 
-        'src': './layers/',
+        'image': panther, 
+        'src': './layers/panther.png',
         'z_index': -1.25,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
-        'image': leaf_back, 
-        'src': './layers/',
-        'z_index': -1,
+        'image': front_tree, 
+        'src': './layers/front_tree.png',
+        'z_index': -1, 
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
-    },
+    }, 
     {
-        'image': shadows, 
-        'src': './layers/',
+        'image': leaves_front, 
+        'src': './layers/leaves_front.png',
         'z_index': -0.25,
         'position': {x: 0, y:0},
         'blend': null,
@@ -104,225 +112,288 @@ var layer_list =[
     },
     {
         'image': mask, 
-        'src': './layers/',
+        'src': './layers/mask.png',
         'z_index': 0, // centre of rotaion - stay in place
-        'position': {x: 0, y:0},
-        'blend': null,
-        'opasity': 1
-    }, //look to be forward in space
-    {
-        'image': panther, 
-        'src': './layers/',
-        'z_index': 0.25,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
-        'image': leaves_left, 
-        'src': './layers/',
+        'image': lights_back, 
+        'src': './layers/lights_back.png',
         'z_index': 1,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
     {
-        'image': leaves_right, 
-        'src': './layers/',
+        'image': lights_front, 
+        'src': './layers/lights_front.png',
         'z_index': 1.25,
         'position': {x: 0, y:0},
         'blend': null,
         'opasity': 1
     },
-    {
-        'image': floaties_2, 
-        'src': './layers/',
-        'z_index': 2,
-        'position': {x: 0, y:0},
-        'blend': null,
-        'opasity': 1
-    },
-
 ];
 
-layer_list.forEach(function(layer,index){
-    layer.image.onload = function(){
-        load_counter +=1;
-        if(load_counter >= layer_list.length){
-            hideLoading();
-            requestAnimationFrame(drawCanvas);
-        }
-    }
-    layer.image.src = layer.src;
+// Go through the list of layer objects and load images from source
+// When all images are loaded, the loading screen will be hidden, and the render loop will start running
+layer_list.forEach(function(layer, index) {
+	// This is a function to run when the image is loaded
+	layer.image.onload = function() {
+		// Add 1 to the load counter
+		load_counter += 1;
+		// Checks if all the images are loaded
+		if (load_counter >= layer_list.length) {
+			// remove loading mask here
+			hideLoading();
+			// Start the render Loop!
+			requestAnimationFrame(drawCanvas);
+		}
+	};
+	// This actually tells the image to load
+	layer.image.src = layer.src;
 });
 
+// Function to hide the loading mask
 function hideLoading() {
 	loading_screen.classList.add('hidden');
 }
 
-function drawCanvas(){
-    // clear canvas 
-    context.clearRect(0,0, canvas.width, canvas.height);
-
-    TWEEN.update();
-    // calculate how much canvas should rotate
-    var rotate_x = (pointer.y * -0.15) + (motion.y * -1.2);
-    var rotate_y = (pointer.x * 0.15) + (motion.x * 1.2);
-    
-    // actually rotate canvas 
-    canvas.style.transform = "rotateX(" + rotate_x + "deg) rotateY(" + rotate_y + "deg)";
-
-    // loop through each layer and draw on cnavas
-    layer_list.forEach(function(layer, index){
-
-        layer.position = getOffset(layer);
-
-        if(layer.blend){
-            context.globalCompositeOperation = layer.blend;
-        }else {
-            context.globalCompositeOperation = 'normal';
-        }
-
-        //context.globalAlpha = layer.opasity;
-
-        context.drawImage(layr.image, layer.position.x, layer.position.y);
-    });
-    requestAnimationFrame(drawCanvas);
+// Draw layers in Canvas
+function drawCanvas() {
+	// Erase everything currently on the canvas
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	
+	// This is needed for the animation to snap back to center when you release mouse or touch
+	TWEEN.update();
+	
+	// Calculate how much the canvas should be rotated
+	var rotate_x = (pointer.y * -0.15) + (motion.y * 1.2);
+	var rotate_y = (pointer.x * 0.15) + (motion.x * 1.2);
+	
+	// Actually rotate the canvas
+	canvas.style.transform = "rotateX(" + rotate_x + "deg) rotateY(" + rotate_y + "deg)";
+		
+	// Loop through each layer in the list and draw it to the canvas
+	layer_list.forEach(function(layer, index) {
+		
+		// Calculate what the position of the layer should be (getOffset function is below)
+		layer.position = getOffset(layer);
+		
+		// If the layer has a blend mode set, use that blend mode, otherwise use normal
+		if (layer.blend) {
+			context.globalCompositeOperation = layer.blend;
+		} else {
+			context.globalCompositeOperation = 'normal';
+		}
+		// Set the opacity of the layer
+		context.globalAlpha = layer.opacity;
+		// Draw the layer into the canvas context
+		context.drawImage(layer.image, layer.position.x, layer.position.y);
+	});
+	
+	// Loop this function! requestAnimationFrame is a special built in function that can draw to the canvas at 60 frames per second
+	// NOTE: do not call drawCanvas() without using requestAnimationFrame here—things will crash!
+	requestAnimationFrame(drawCanvas);
 }
-function getOffset(layer){
-    var touch_multiplier = 0.2;
-    var touch_offset_x = pointer.x * layer.z_index * touch_multiplier;
-    var touch_offset_y = pointer.y * layer.z_index * touch_multiplier;
 
-    var motion_multiplier = 2.5;
+// Function to calculate layer offset
+function getOffset(layer) {
+	// Calculate the amount you want the layers to move based on touch or mouse input.
+	// You can play with the touch_multiplier variable here. Depending on the size of your canvas you may want to turn it up or down.
+	var touch_multiplier = 0.3;
+	var touch_offset_x = pointer.x * layer.z_index * touch_multiplier;
+	var touch_offset_y = pointer.y * layer.z_index * touch_multiplier;
+	
+	// Calculate the amount you want the layers to move based on the gyroscope
+	// You can play with the motion_multiplier variable here. Depending on the size of your canvas you may want to turn it up or down.
+	var motion_multiplier = 2.5;
 	var motion_offset_x = motion.x * layer.z_index * motion_multiplier;
 	var motion_offset_y = motion.y * layer.z_index * motion_multiplier;
 	
-    var offset = {
-        x: touch_offset_x + motion_offset_x,
-        y: touch_offset_y + motion_offset_y
-    };
-    return offset;
+	// Calculate the total offset for both X and Y
+	// Total offset is a combination of touch and motion
+	var offset = {
+		x: touch_offset_x + motion_offset_x,
+		y: touch_offset_y + motion_offset_y
+	};
+
+	// Return the calculated offset to whatever requested it.
+	return offset;
 }
 
-//--- Touch and mouse controls ---//
+
+
+
+//// TOUCH AND MOUSE CONTROLS ////
+
+// Initialize variables for touch and mouse-based parallax
+
+// This is a variable we're using to only move things when you're touching the screen, or holding the mouse button down.
 var moving = false;
 
-//initialise touch and mouse position
-var pointer_initial ={
-    x:0,
-    y:0
+// Initialize touch and mouse position
+var pointer_initial = {
+	x: 0,
+	y: 0
+};
+var pointer = {
+	x: 0,
+	y: 0
 };
 
-var pointer ={
-    x:0,
-    y:0
-};
-
+// This one listens for when you start touching the canvas element
 canvas.addEventListener('touchstart', pointerStart);
+// This one listens for when you start clicking on the canvas (when you press the mouse button down)
 canvas.addEventListener('mousedown', pointerStart);
 
-function pointerStart(event){
-    moving = true;
-    if (event.type === 'touchstart'){
-        alert('touch');
-        pointer_initial.x = event.touches[0].clientX;
-        pointer_initial.y = event.touches[0].clientY;
-    }else if (event.type === 'mousedown'){
-        alert('mousedown');
-        pointer_initial.x = event.clientX;
-        pointer_initial.y = event.clientY;
-    }
+// Runs when touch or mouse click starts
+function pointerStart(event) {
+	// Ok, you touched the screen or clicked, now things can move until you stop doing that
+	moving = true;
+	// Check if this is a touch event
+	if (event.type === 'touchstart') {
+		// set initial touch position to the coordinates where you first touched the screen
+		pointer_initial.x = event.touches[0].clientX;
+		pointer_initial.y = event.touches[0].clientY;
+	// Check if this is a mouse click event
+	} else if (event.type === 'mousedown') {
+		// set initial mouse position to the coordinates where you first clicked
+		pointer_initial.x = event.clientX;
+		pointer_initial.y = event.clientY;
+	}
 }
 
-window.addEventListener('touchmove', pointerMove);
+
+// This runs whenever your finger moves anywhere in the browser window
 window.addEventListener('mousemove', pointerMove);
+// This runs whenever your mouse moves anywhere in the browser window
+window.addEventListener('touchmove', pointerMove);
 
-function pointerMove(event){
-    event.preventDefault();
-    if (moving === true){
-        var current_x = 0;
-        var current_y = 0;
-        if (event.type === 'touchmove') {
-            current_x = event.touches[0].clientX;
-            current_y = event.touches[0].clientY;
-        } else if(event.type === 'mousemove'){
-            current_x = event.clientX;
-            current_y = event.clientY;
-        }
-        pointer.x = current_x - pointer_initial.x;
-        pointer.y = current_y - pointer_initial.y;
-    }
-}
-canvas.addEventListener('touchmove', function(event){
-    event.preventDefault();
+// Runs when touch or mouse is moved
+function pointerMove(event) {
+	// This is important to prevent scrolling the page instead of moving layers around
+	event.preventDefault();
+	// Only run this if touch or mouse click has started
+	if (moving === true) {
+		var current_x = 0;
+		var current_y = 0;
+		// Check if this is a touch event
+		if (event.type === 'touchmove') {
+			// Current position of touch
+			current_x = event.touches[0].clientX;
+			current_y = event.touches[0].clientY;
+		// Check if this is a mouse event
+		} else if (event.type === 'mousemove') {
+			// Current position of mouse cursor
+			current_x = event.clientX;
+			current_y = event.clientY;
+		}
+		// Set pointer position to the difference between current position and initial position
+		pointer.x = current_x - pointer_initial.x;
+		pointer.y = current_y - pointer_initial.y; 
+	}
+};
+
+// Listen to any time you move your finger in the canvas element
+canvas.addEventListener('touchmove', function(event) {
+	// Don't scroll the screen
+	event.preventDefault();
 });
-canvas.addEventListener('mousemove', function(event){
-    event.preventDefault();
+// Listen to any time you move your mouse in the canvas element
+canvas.addEventListener('mousemove', function(event) {
+	// Don't do whatever would normally happen when you click and drag
+	event.preventDefault();
 });
 
-// snap back after no touch/mouse
-window.addEventListener('touchend', function(event){
-    endGesture();
+// Listen for when you stop touching the screen
+window.addEventListener('touchend', function(event) {
+	// Run the endGesture function (below)
+	endGesture();
 });
-window.addEventListener('mouseup', function(event){
-    endGesture();
+// Listen for when you release the mouse button anywhere on the screen
+window.addEventListener('mouseup', function(event) {
+	// Run the endGesture function (below)
+	endGesture();
 });
 
-function endGesture(){
-    moving = false;
-    
-    // This removes any in progress tweens
+
+function endGesture() {
+	// You aren't touching or clicking anymore, so set this back to false
+	moving = false;
+	
+	// This removes any in progress tweens
 	TWEEN.removeAll();
 	// This starts the animation to reset the position of all layers when you stop moving them
 	var pointer_tween = new TWEEN.Tween(pointer).to({x: 0, y: 0}, 300).easing(TWEEN.Easing.Back.Out).start();	
 }
 
-//--- Motion controls ---//
 
-//initialise varibels for motion based paralax
-var motion_initial ={
-    x:null,
-    y:null
+//// MOTION CONTROLS ////
+
+// Initialize variables for motion-based parallax
+var motion_initial = {
+	x: null,
+	y: null
 };
-
 var motion = {
-    x: 0, 
-    y: 0
+	x: 0,
+	y: 0
 };
 
-// listen to gyroscope events 
-window.addEventListener('deviceorientation', function(event){
-    // if first time through 
-    if(!motion_initial.x && !motion_initial.y){
-        motion_initial.x = event.beta;
-        motion_initial.y = event.gamma;
-    }
-
-    // check orientation 
-    if(window.orientation === 0){
-        // the device is in portrait orientation
-        motion.x = event.gamma - motion_initial.y;
-        motion.y = event.beta - motion_initial.x;
-        
-    } else if (window.orientation === 90){
-        // in landscape left
-        motion.x = event.beta - motion_initial.x;
-        motion.y = -event.gamma + motion_initial.y
-        
-    } else if (window.orientation === -90){
-        // in landscpe right 
-        motion.x = -event.beta + motion_initial.x;
+// This is where we listen to the gyroscope position
+window.addEventListener('deviceorientation', function(event) {
+	// If this is the first run through here, set the initial position of the gyroscope
+	if (!motion_initial.x && !motion_initial.y) {
+		motion_initial.x = event.beta;
+		motion_initial.y = event.gamma;
+	}
+	
+	// Depending on what orientation the device is in, you need to adjust what each gyroscope axis means
+	// This can be a bit tricky
+    if (window.orientation === 0) {
+    	// The device is right-side up in portrait orientation
+    	motion.x = event.gamma - motion_initial.y;
+    	motion.y = event.beta - motion_initial.x;
+    } else if (window.orientation === 90) {
+    	// The device is in landscape laying on its left side
+    	motion.x = event.beta - motion_initial.x;
+    	motion.y = -event.gamma + motion_initial.y;
+    } else if (window.orientation === -90) {
+    	// The device is in landscape laying on its right side
+    	motion.x = -event.beta + motion_initial.x;
     	motion.y = event.gamma - motion_initial.y;
     } else {
-        // upside down
-        motion.x = -event.gamma + motion_initial.y;
-        motion.y = -event.beta + motion_initial.x;
-    } 
+    	// The device is upside-down in portrait orientation
+		motion.x = -event.gamma + motion_initial.y;
+		motion.y = -event.beta + motion_initial.x;
+    }
 
+	// This is optional, but prevents things from moving too far (because these are 2d images it can look broken)
+	var max_offset = 23;
+    
+    // Check if magnitude of motion offset along X axis is greater than your max setting
+    if (Math.abs(motion.x) > max_offset) {
+    	// Check whether offset is positive or negative, and make sure to keep it that way
+    	if (motion.x < 0) {
+    		motion.x = -max_offset;
+    	} else {
+    		motion.x = max_offset;
+    	}
+    }
+    // Check if magnitude of motion offset along Y axis is greater than your max setting
+    if (Math.abs(motion.y) > max_offset) {
+    	// Check whether offset is positive or negative, and make sure to keep it that way
+    	if (motion.y < 0) {
+    		motion.y = -max_offset;
+    	} else {
+    		motion.y = max_offset;
+    	}
+    }
 });
 
-// fix mix-matched layes when changing orientation 
+// Reset the position of motion controls when device changes between portrait and landscape, etc.
 window.addEventListener('orientationchange', function(event) {
 	motion_initial.x = 0;
 	motion_initial.y = 0;
