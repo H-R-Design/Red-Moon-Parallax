@@ -9,6 +9,7 @@ body {
 	align-items: center;
 	font-family: sans-serif;
 	overflow: hidden !important;
+	cursor: pointer;
 }
 
 .image-container {
