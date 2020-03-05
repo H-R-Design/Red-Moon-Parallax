@@ -9,7 +9,6 @@ body {
 	align-items: center;
 	font-family: sans-serif;
 	overflow: hidden !important;
-	cursor: pointer;
 }
 
 .image-container {
@@ -28,6 +27,7 @@ body {
 	max-width: 100%;
 	display: block;
 	margin: auto;
+	cursor: pointer;
 }
 .loading-screen {
 	position: absolute;
