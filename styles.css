@@ -22,12 +22,12 @@ body {
 	transform: translate3d(0, 0, 0);	
 }
 .canvas {
+	cursor: pointer;
 	width: auto;
 	max-height: 100%;
 	max-width: 100%;
 	display: block;
 	margin: auto;
-	cursor: pointer;
 }
 .loading-screen {
 	position: absolute;
